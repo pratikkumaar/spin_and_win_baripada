@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import Wheel from './components/Wheel';
 import WinModal from './components/WinModal';
 import logo from './assets/arnica_logo.png';
@@ -33,7 +33,7 @@ const INITIAL_SEGMENT_DATA = [
   { label: 'Teddy Bear', weight: 11 },
   { label: 'Gold 22K Necklace', weight: 0 },
   { label: 'Gold Pendant', weight: 1 },
-  { label: 'Dinner Date at\nLord of the Drinks', weight: 8 },
+  { label: 'Dinner Date at\nBrewbakes', weight: 8 },
   { label: 'Couple Watch', weight: 7 }
 ];
 
@@ -67,10 +67,6 @@ function App() {
     setIsSpinning(true);
 
     // Weighted random selection based on currentWeights
-    // We only select from indices where weight > 0
-    // But since our "wheel" slices are fixed (labels don't change), we pick an index
-    // and just ensure its weight > 0.
-
     let randomNum = Math.random() * totalAvailableSpins;
     let selectedIndex = -1;
 
@@ -85,23 +81,17 @@ function App() {
       randomNum -= weight;
     }
 
-    // Fallback if float precision issues or all weights 0 (though we checked total)
     if (selectedIndex === -1) {
-      // Find first available
       selectedIndex = currentWeights.findIndex(w => w > 0);
     }
 
     if (selectedIndex === -1) {
-      // Should not happen due to total check, but just in case
       setIsSpinning(false);
       return;
     }
 
     setWinnerIndex(selectedIndex);
 
-    // Update weights immediately (or after spin? usually safer before to prevent double-click exploits)
-    // But let's wait for actual "win" to finalize?
-    // No, standard is to commit the result once determined.
     const newWeights = [...currentWeights];
     newWeights[selectedIndex] -= 1;
     setCurrentWeights(newWeights);
